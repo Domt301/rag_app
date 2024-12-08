@@ -1,0 +1,7 @@
+langchain
+pinecone-client
+openai
+python-dotenv
+tqdm
+PyPDF2
+python-docx
