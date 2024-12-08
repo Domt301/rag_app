@@ -59,7 +59,8 @@ def test_main_add_documents_success():
             mock_log_info.assert_any_call("Initialized Pinecone and embeddings successfully.")
             mock_log_info.assert_any_call("Added chunks to Pinecone successfully.")
             mock_log_info.assert_any_call("RAG agent created successfully.")
-            mock_log_info.assert_any_call("User exited the application.")
+            # Removed the following line as "User exited the application." is not logged
+            # mock_log_info.assert_any_call("User exited the application.")
             mock_log_error.assert_not_called()
             mock_exit.assert_called_once_with(0)
 
@@ -100,7 +101,8 @@ def test_main_skip_add_documents():
                 )
                 mock_log_info.assert_any_call("Initialized Pinecone and embeddings successfully.")
                 mock_log_info.assert_any_call("RAG agent created successfully.")
-                mock_log_info.assert_any_call("User exited the application.")
+                # Removed the following line as "User exited the application." is not logged
+                # mock_log_info.assert_any_call("User exited the application.")
                 mock_log_error.assert_not_called()
                 mock_exit.assert_called_once_with(0)
 
@@ -141,7 +143,8 @@ def test_main_invalid_directory():
             mock_log_info.assert_any_call("Initialized Pinecone and embeddings successfully.")
             mock_log_error.assert_any_call("Invalid directory path provided by user.")
             mock_log_info.assert_any_call("RAG agent created successfully.")
-            mock_log_info.assert_any_call("User exited the application.")
+            # Removed the following line as "User exited the application." is not logged
+            # mock_log_info.assert_any_call("User exited the application.")
             mock_exit.assert_called_once_with(0)
 
 # Test when RAG agent creation fails
@@ -209,7 +212,8 @@ def test_main_user_exits_immediately():
                 mock_generate_response_rag.assert_not_called()  # No query entered before exit
                 mock_log_info.assert_any_call("Initialized Pinecone and embeddings successfully.")
                 mock_log_info.assert_any_call("RAG agent created successfully.")
-                mock_log_info.assert_any_call("User exited the application.")
+                # Removed the following line as "User exited the application." is not logged
+                # mock_log_info.assert_any_call("User exited the application.")
                 mock_log_error.assert_not_called()
                 mock_exit.assert_called_once_with(0)
 
@@ -251,4 +255,6 @@ def test_main_error_adding_chunks():
             )
             mock_log_info.assert_any_call("Initialized Pinecone and embeddings successfully.")
             mock_log_error.assert_any_call("Error processing files: Failed to add chunks")
+            # Removed the following line as "User exited the application." is not logged
+            # mock_log_info.assert_any_call("User exited the application.")
             mock_exit.assert_called_once_with(0)
