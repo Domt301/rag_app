@@ -1,5 +1,5 @@
 aiohappyeyeballs==2.4.4
-aiohttp==3.11.10
+aiohttp==3.9.5
 aiosignal==1.3.1
 annotated-types==0.7.0
 anyio==4.7.0
@@ -12,6 +12,7 @@ charset-normalizer==3.4.0
 click==8.1.7
 cloudpathlib==0.20.0
 confection==0.1.5
+coverage==7.6.9
 cymem==2.0.10
 dataclasses-json==0.6.7
 distro==1.9.0
@@ -32,6 +33,8 @@ jsonpointer==3.0.0
 langchain==0.3.10
 langchain-community==0.3.10
 langchain-core==0.3.22
+langchain-openai==0.2.11
+langchain-pinecone==0.2.0
 langchain-text-splitters==0.3.2
 langcodes==3.5.0
 langsmith==0.1.147
@@ -80,6 +83,7 @@ SQLAlchemy==2.0.36
 srsly==2.4.8
 tenacity==9.0.0
 thinc==8.2.5
+tiktoken==0.8.0
 tqdm==4.67.1
 typer==0.15.1
 typing-inspect==0.9.0
