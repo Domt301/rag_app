@@ -6,25 +6,34 @@ from utils import display_progress, log_info, log_error
 import os
 import sys
 
-def main():
-    print("Welcome to the RAG Application!")
-    
+def initialize_application():
+    """
+    Initialize Pinecone and embeddings.
+    """
     try:
         index = initialize_pinecone()
         embeddings = get_embeddings()
         log_info("Initialized Pinecone and embeddings successfully.")
+        return index, embeddings
     except Exception as e:
         log_error(f"Error initializing Pinecone: {e}")
         print(f"Error initializing Pinecone: {e}")
         sys.exit(1)
 
+def process_documents(index, embeddings):
+    """
+    Process and add documents to the vector database.
+    """
     add_docs = prompt_add_documents()
-
     if add_docs:
-        directory = get_user_input("Enter the directory path containing your documents: ")
+        directory = get_user_input("Enter the directory path containing your documents (or type 'exit' to quit): ", exit_message="Exiting document processing.")
         if os.path.isdir(directory):
             try:
                 chunks = process_files(directory)
+                if not chunks:
+                    print("No valid content found in the directory.")
+                    log_info("No chunks processed; directory may not contain valid files.")
+                    return
                 num_chunks = len(chunks)
                 print(f"Processing {num_chunks} chunks...")
                 pbar = display_progress(num_chunks, description="Adding chunks to Pinecone")
@@ -39,23 +48,13 @@ def main():
             log_error("Invalid directory path provided by user.")
             print("Invalid directory path.")
 
-    # Create the RAG agent
-    try:
-        qa_chain = create_rag_agent(index, embeddings)
-        log_info("RAG agent created successfully.")
-        print("RAG agent with LangChain is ready for use!")
-    except Exception as e:
-        log_error(f"Error creating RAG agent: {e}")
-        print(f"Error creating RAG agent: {e}")
-        sys.exit(1)
-
-    # Start the conversation loop
+def start_query_loop(qa_chain):
+    """
+    Start the query-response loop with the RAG agent.
+    """
+    print("RAG agent with LangChain is ready for use!")
     while True:
-        user_query = get_user_input("\nEnter your query (or type 'exit' to quit): ")
-        if user_query.lower() in ['exit', 'quit']:
-            print("Goodbye!")
-            log_info("User exited the application.")
-            break
+        user_query = get_user_input("\nEnter your query (or type 'exit' to quit): ", exit_message="Exiting the application.")
         try:
             response = generate_response_rag(qa_chain, user_query)
             print(f"Agent: {response}")
@@ -63,6 +62,27 @@ def main():
         except Exception as e:
             log_error(f"Error generating response: {e}")
             print(f"Error generating response: {e}")
+
+def main():
+    print("Welcome to the RAG Application!")
+    
+    # Initialization
+    index, embeddings = initialize_application()
+    
+    # Document Processing
+    process_documents(index, embeddings)
+
+    # Create RAG Agent
+    try:
+        qa_chain = create_rag_agent(index, embeddings)
+        log_info("RAG agent created successfully.")
+    except Exception as e:
+        log_error(f"Error creating RAG agent: {e}")
+        print(f"Error creating RAG agent: {e}")
+        sys.exit(1)
+
+    # Query Loop
+    start_query_loop(qa_chain)
 
 if __name__ == "__main__":
     main()

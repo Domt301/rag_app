@@ -1,22 +1,44 @@
-def get_user_input(prompt_message):
-    return input(prompt_message)
+import sys
+from utils import log_info
+
+def get_user_input(prompt_message, exit_message=None):
+    """
+    Get input from the user with an optional exit message.
+    """
+    while True:
+        user_input = input(prompt_message).strip()
+        if user_input.lower() in ['exit', 'quit']:
+            if exit_message:
+                print(exit_message)
+            log_info("User exited via input.")
+            sys.exit(0)
+        return user_input
+
+def get_yes_no_input(prompt_message):
+    """
+    Get a yes/no response from the user with input validation.
+    """
+    while True:
+        choice = input(prompt_message).strip().lower()
+        if choice in ['yes', 'y']:
+            return True
+        elif choice in ['no', 'n']:
+            return False
+        elif choice in ['exit', 'quit']:
+            print("Exiting...")
+            log_info("User exited via yes/no prompt.")
+            sys.exit(0)
+        else:
+            print("Please enter 'yes' or 'no'.")
 
 def prompt_add_documents():
-    while True:
-        choice = input("Do you want to add documents to the vector database? (yes/no): ").strip().lower()
-        if choice in ['yes', 'y']:
-            return True
-        elif choice in ['no', 'n']:
-            return False
-        else:
-            print("Please enter 'yes' or 'no'.")
+    """
+    Prompt the user to decide if they want to add documents.
+    """
+    return get_yes_no_input("Do you want to add documents to the vector database? (yes/no): ")
 
 def prompt_continue_conversation():
-    while True:
-        choice = input("Do you want to continue the conversation? (yes/no): ").strip().lower()
-        if choice in ['yes', 'y']:
-            return True
-        elif choice in ['no', 'n']:
-            return False
-        else:
-            print("Please enter 'yes' or 'no'.")
+    """
+    Prompt the user to decide if they want to continue the conversation.
+    """
+    return get_yes_no_input("Do you want to continue the conversation? (yes/no): ")
