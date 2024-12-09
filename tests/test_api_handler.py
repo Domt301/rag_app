@@ -1,9 +1,6 @@
-# tests/test_api_handler.py
-
 import pytest
 from unittest.mock import patch, MagicMock
 from api_handler import create_rag_agent, generate_response_rag
-
 
 # Mocked constants and objects
 MOCK_INDEX = MagicMock()
@@ -14,9 +11,13 @@ MOCK_RESPONSE = "Paris is the capital of France."
 
 @patch("api_handler.PineconeVectorStore")
 @patch("api_handler.RetrievalQA")
+@patch("api_handler.ConversationChain")
+@patch("api_handler.ConversationSummaryMemory")
 @patch("api_handler.OpenAI")
-def test_create_rag_agent_success(mock_openai, mock_retrievalqa, mock_pineconevectorstore):
-    """Test successful creation of a RAG agent."""
+def test_create_rag_agent_with_retrieval(
+    mock_openai, mock_memory, mock_conversationchain, mock_retrievalqa, mock_pineconevectorstore
+):
+    """Test successful creation of a RAG agent with retrieval."""
     mock_openai.return_value = MagicMock()
     mock_retrievalqa.from_chain_type.return_value = MagicMock()
 
@@ -29,13 +30,34 @@ def test_create_rag_agent_success(mock_openai, mock_retrievalqa, mock_pineconeve
         text_key="text"
     )
     mock_retrievalqa.from_chain_type.assert_called_once()
+    mock_memory.assert_not_called()  # Ensure ConversationSummaryMemory is not used in retrieval mode
+    mock_conversationchain.assert_not_called()  # Ensure fallback agent is not used
     assert result == mock_retrievalqa.from_chain_type.return_value
+
+
+@patch("api_handler.OpenAI")
+@patch("api_handler.ConversationChain")
+@patch("api_handler.ConversationSummaryMemory")
+def test_create_rag_agent_without_retrieval(
+    mock_memory, mock_conversationchain, mock_openai
+):
+    """Test successful creation of a conversation-only RAG agent without retrieval."""
+    mock_openai.return_value = MagicMock()
+    mock_conversationchain.return_value = MagicMock()
+    mock_memory.return_value = MagicMock()
+
+    result = create_rag_agent(None, MOCK_EMBEDDINGS)
+
+    # Assertions
+    mock_memory.assert_called_once_with(llm=mock_openai.return_value)  # Ensure ConversationSummaryMemory is initialized
+    mock_conversationchain.assert_called_once_with(llm=mock_openai.return_value, memory=mock_memory.return_value)
+    assert result == mock_conversationchain.return_value
 
 
 def test_create_rag_agent_invalid_index():
     """Test creation of RAG agent with invalid index."""
-    with pytest.raises(ValueError, match="Invalid Pinecone index provided."):
-        create_rag_agent(None, MOCK_EMBEDDINGS)
+    with pytest.raises(ValueError, match="Invalid embeddings object provided."):
+        create_rag_agent(None, None)
 
 
 def test_create_rag_agent_invalid_embeddings():
@@ -46,8 +68,7 @@ def test_create_rag_agent_invalid_embeddings():
 
 @patch("api_handler.PineconeVectorStore")
 @patch("api_handler.RetrievalQA")
-@patch("api_handler.OpenAI")
-def test_create_rag_agent_failure(mock_openai, mock_retrievalqa, mock_pineconevectorstore):
+def test_create_rag_agent_failure(mock_retrievalqa, mock_pineconevectorstore):
     """Test failure in creating a RAG agent."""
     mock_pineconevectorstore.side_effect = Exception("Initialization failed.")
 
@@ -64,7 +85,7 @@ def test_generate_response_rag_success(mock_retrievalqa):
     result = generate_response_rag(mock_chain, MOCK_QUERY)
 
     # Assertions
-    mock_chain.run.assert_called_once_with(MOCK_QUERY)
+    mock_chain.run.assert_called_once_with({"query": MOCK_QUERY})
     assert result == MOCK_RESPONSE
 
 

@@ -37,6 +37,16 @@ def prompt_add_documents():
     """
     return get_yes_no_input("Do you want to add documents to the vector database? (yes/no): ")
 
+def prompt_fallback_mode():
+    """
+    Inform the user about fallback mode when no documents are in the database.
+    """
+    print(
+        "No documents found in the vector database. The AI will answer questions using general knowledge only. "
+        "To improve responses, consider adding documents."
+    )
+    log_info("User informed about fallback mode.")
+
 def prompt_continue_conversation():
     """
     Prompt the user to decide if they want to continue the conversation.

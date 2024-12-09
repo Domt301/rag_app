@@ -52,7 +52,7 @@ def read_txt(file_path):
         with open(file_path, 'rb') as f:
             raw_data = f.read()
             detected = chardet.detect(raw_data)
-            encoding = detected['encoding']
+            encoding = detected['encoding'] if detected['confidence'] > 0.5 else 'utf-8'
         with open(file_path, 'r', encoding=encoding) as f:
             text = f.read()
         log_info(f"Successfully read TXT: {file_path} with encoding {encoding}")
@@ -78,16 +78,12 @@ def chunk_text(text, max_length=1000, chunk_overlap=100):
         for sentence in sentences:
             if len(current_chunk) + len(sentence) > max_length:
                 chunks.append(current_chunk.strip())
-                # Add overlap from the end of the previous chunk
-                current_chunk = sentence[-chunk_overlap:]
+                current_chunk = sentence[-chunk_overlap:]  # Add overlap
             else:
                 current_chunk += " " + sentence
         
         if current_chunk.strip():
             chunks.append(current_chunk.strip())
-
-        # Ensure all chunks are within max_length
-        chunks = [chunk[:max_length] for chunk in chunks]
 
         log_info(f"Successfully chunked text into {len(chunks)} chunks.")
         return chunks

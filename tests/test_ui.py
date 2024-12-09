@@ -1,8 +1,12 @@
-# tests/test_ui.py
-
 import pytest
 from unittest.mock import patch
-from ui import get_user_input, get_yes_no_input, prompt_add_documents, prompt_continue_conversation
+from ui import (
+    get_user_input,
+    get_yes_no_input,
+    prompt_add_documents,
+    prompt_continue_conversation,
+    prompt_fallback_mode
+)
 
 
 # Helper function to mock input calls
@@ -15,7 +19,7 @@ def mock_sys_exit():
 
 
 @mock_sys_exit()
-@patch("ui.log_info")  # Mock log_info correctly
+@patch("ui.log_info")
 def test_get_user_input_exit(mock_log_info, mock_exit):
     """Test get_user_input exits when 'exit' is entered."""
     with mock_inputs(["exit"]):
@@ -26,7 +30,7 @@ def test_get_user_input_exit(mock_log_info, mock_exit):
 
 
 @mock_sys_exit()
-@patch("ui.log_info")  # Mock log_info correctly
+@patch("ui.log_info")
 def test_get_user_input_quit(mock_log_info, mock_exit):
     """Test get_user_input exits when 'quit' is entered."""
     with mock_inputs(["quit"]):
@@ -44,7 +48,7 @@ def test_get_user_input_valid():
 
 
 @mock_sys_exit()
-@patch("ui.log_info")  # Mock log_info correctly
+@patch("ui.log_info")
 def test_get_yes_no_input_exit(mock_log_info, mock_exit):
     """Test get_yes_no_input exits when 'exit' or 'quit' is entered."""
     with mock_inputs(["exit"]):
@@ -105,3 +109,15 @@ def test_prompt_continue_conversation_no(mock_get_yes_no_input):
     result = prompt_continue_conversation()
     assert result is False
     mock_get_yes_no_input.assert_called_once_with("Do you want to continue the conversation? (yes/no): ")
+
+
+@patch("ui.log_info")
+@patch("builtins.print")
+def test_prompt_fallback_mode(mock_print, mock_log_info):
+    """Test prompt_fallback_mode displays the correct message and logs the event."""
+    prompt_fallback_mode()
+    mock_print.assert_called_once_with(
+        "No documents found in the vector database. The AI will answer questions using general knowledge only. "
+        "To improve responses, consider adding documents."
+    )
+    mock_log_info.assert_called_once_with("User informed about fallback mode.")
