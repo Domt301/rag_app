@@ -17,6 +17,15 @@ def display_progress(total, description="Processing"):
     pbar = tqdm(total=total, desc=description)
     return pbar
 
+def display_query_progress(total_steps=3, step_duration=1):
+    """
+    Displays a progress bar to indicate query processing.
+    """
+    with tqdm(total=total_steps, desc="Query in progress") as pbar:
+        for _ in range(total_steps):
+            time.sleep(step_duration)
+            pbar.update(1)
+
 def log_info(message):
     """
     Logs informational messages to the log file.

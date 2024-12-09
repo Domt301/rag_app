@@ -6,6 +6,7 @@ from langchain.memory import ConversationSummaryMemory
 from langchain_pinecone import PineconeVectorStore
 from db_connector import retrieve_chunks, get_embeddings
 from utils import log_error, log_info
+from ui import show_loading_message
 
 def create_rag_agent(index, embeddings, model="gpt-4", return_sources=False):
     """
@@ -56,6 +57,7 @@ def create_rag_agent(index, embeddings, model="gpt-4", return_sources=False):
     except Exception as e:
         log_error(f"Error creating RAG agent: {e}")
         raise RuntimeError("Failed to create RAG agent.") from e
+
 def generate_response_rag(qa_chain, query):
     """
     Generates a response from the RAG agent based on the user's query.
@@ -74,6 +76,7 @@ def generate_response_rag(qa_chain, query):
         raise ValueError("The query must be a non-empty string.")
 
     try:
+        show_loading_message("Processing your query, please wait")
         response = qa_chain.run({"query": query})
         log_info(f"Generated response for query: '{query}'")
         return response

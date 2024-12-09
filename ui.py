@@ -1,4 +1,5 @@
 import sys
+import time
 from utils import log_info
 
 def get_user_input(prompt_message, exit_message=None):
@@ -52,3 +53,13 @@ def prompt_continue_conversation():
     Prompt the user to decide if they want to continue the conversation.
     """
     return get_yes_no_input("Do you want to continue the conversation? (yes/no): ")
+
+def show_loading_message(message, duration=2):
+    """
+    Display a loading message for a specific duration.
+    """
+    print(message, end="", flush=True)
+    for _ in range(duration):
+        time.sleep(1)
+        print(".", end="", flush=True)
+    print()  # End the loading line

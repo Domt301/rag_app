@@ -1,4 +1,4 @@
-from ui import get_user_input, prompt_add_documents
+from ui import get_user_input, prompt_add_documents, show_loading_message
 from file_handler import process_files
 from db_connector import initialize_pinecone, get_embeddings, add_chunks_to_pinecone, retrieve_chunks
 from api_handler import create_rag_agent, generate_response_rag
@@ -68,6 +68,7 @@ def start_query_loop(qa_chain):
     while True:
         user_query = get_user_input("\nEnter your query (or type 'exit' to quit): ", exit_message="Exiting the application.")
         try:
+            show_loading_message("Processing your query, please wait")
             response = generate_response_rag(qa_chain, user_query)
             print(f"Agent: {response}")
             log_conversation(user_query, response, conversation_history)
