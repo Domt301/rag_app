@@ -143,3 +143,5 @@ app.log
 
 # VS Code
 .v
+.docs/
+docs/Acura_RSX_Shop_Manual.pdf

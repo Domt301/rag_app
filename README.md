@@ -73,6 +73,8 @@ python main.py
 	2.	Follow the on-screen prompts to:
 	•	Add documents to the database.
 	•	Query the system.
+	pass a directory to the app like so
+	/Users/your_username/Documents/my_files
 
 Features
 

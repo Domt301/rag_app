@@ -1,12 +1,20 @@
-import pinecone
+from pinecone import Pinecone, ServerlessSpec
+
 from config import (
     PINECONE_API_KEY,
-    PINECONE_ENVIRONMENT,
     PINECONE_INDEX,
     OPENAI_API_KEY
 )
 from langchain_community.embeddings import OpenAIEmbeddings
 from utils import log_error, log_info
+
+# Define the serverless spec for cloud and region
+CLOUD = 'aws'
+REGION = 'us-east-1'
+SPEC = ServerlessSpec(cloud=CLOUD, region=REGION)
+
+# Initialize Pinecone client with the serverless spec
+pc = Pinecone(api_key=PINECONE_API_KEY, spec=SPEC)
 
 def initialize_pinecone():
     """
@@ -16,11 +24,22 @@ def initialize_pinecone():
         pinecone.Index: An instance of the Pinecone index, or None if initialization fails.
     """
     try:
-        pinecone.init(api_key=PINECONE_API_KEY, environment=PINECONE_ENVIRONMENT)
-        if PINECONE_INDEX not in pinecone.list_indexes():
-            pinecone.create_index(PINECONE_INDEX, dimension=768)  # Adjust dimension as needed
+        # List available indexes and check if the desired index exists
+        existing_indexes = pc.list_indexes().names()
+        if PINECONE_INDEX not in existing_indexes:
+            pc.create_index(
+                name=PINECONE_INDEX,
+                dimension=768,  # Ensure this matches your embedding dimensionality
+                metric='cosine', 
+                spec=SPEC,
+                  # Recommended for semantic similarity searches
+                # metadata_config={"indexed": ["text"]}
+            )
             log_info(f"Created new Pinecone index: {PINECONE_INDEX}")
-        index = pinecone.Index(PINECONE_INDEX)
+        
+        # Initialize the index for further operations
+        # index = pc.index(PINECONE_INDEX)
+        index = pc.Index(name=PINECONE_INDEX)
         log_info(f"Pinecone index '{PINECONE_INDEX}' initialized successfully.")
         return index
     except Exception as e:

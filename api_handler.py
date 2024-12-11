@@ -36,7 +36,7 @@ def create_rag_agent(index, embeddings, model="gpt-4", return_sources=False):
             vector_store = PineconeVectorStore(
                 index=index,
                 embedding=embeddings,
-                text_key="text"
+                text_key="text"  # Ensure this matches the metadata key
             )
             log_info(f"Initialized Pinecone vector store successfully for index: {index.name}.")
 
@@ -49,8 +49,8 @@ def create_rag_agent(index, embeddings, model="gpt-4", return_sources=False):
             log_info("RetrievalQA chain created successfully.")
         else:
             # Fallback to conversation-only agent with memory
+            log_info("No Pinecone index detected; defaulting to memory-based responses.")
             memory = ConversationSummaryMemory(llm=llm)  # Initialize memory only for fallback
-            log_info("No index provided; creating a conversation-only agent with summary memory.")
             qa_chain = ConversationChain(llm=llm, memory=memory)
 
         return qa_chain
