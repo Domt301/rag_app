@@ -64,23 +64,23 @@ class TestDBConnector(unittest.TestCase):
 
     @patch('db_connector.Pinecone.Index')
     def test_retrieve_chunks(self, mock_index):
-        # Mock embeddings and query results
+    # Mock embeddings and query results
         mock_embeddings = MagicMock()
         mock_embeddings.embed_query.return_value = [0.1, 0.2, 0.3]
 
         mock_index_instance = MagicMock()
-        mock_index_instance.query.return_value = {
-            'matches': [
+        mock_index_instance.query.return_value = MagicMock(
+            matches=[
                 {'metadata': {'text': 'Sample chunk 1'}},
                 {'metadata': {'text': 'Sample chunk 2'}}
             ]
-        }
+        )
         mock_index.return_value = mock_index_instance
 
-        # Call the function
+    # Call the function
         result = retrieve_chunks(mock_index_instance, "Test query", mock_embeddings, top_k=2)
 
-        # Assertions
+    # Assertions
         mock_embeddings.embed_query.assert_called_once_with("Test query")
         mock_index_instance.query.assert_called_once_with(
             vector=[0.1, 0.2, 0.3], top_k=2, include_metadata=True
