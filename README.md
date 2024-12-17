@@ -59,7 +59,6 @@ In the root directory of the project, create a file named .env and populate it w
 
 OPENAI_API_KEY=your_openai_api_key
 PINECONE_API_KEY=your_pinecone_api_key
-PINECONE_ENVIRONMENT=your_pinecone_environment
 PINECONE_INDEX=your_pinecone_index_name
 
 Replace the placeholders (your_openai_api_key, etc.) with the respective values obtained earlier.
@@ -100,7 +99,7 @@ Troubleshooting
 
 Common Issues
 	1.	Invalid Pinecone API Key or Environment
-	•	Ensure your .env file contains the correct PINECONE_API_KEY and PINECONE_ENVIRONMENT.
+	•	Ensure your .env file contains the correct PINECONE_API_KEY
 	•	Double-check that your Pinecone index exists.
 	2.	OpenAI API Errors
 	•	Verify your OPENAI_API_KEY in .env.

@@ -33,7 +33,7 @@ jsonpointer==3.0.0
 langchain==0.3.10
 langchain-community==0.3.10
 langchain-core==0.3.22
-langchain-openai==0.2.11
+langchain-openai==0.2.12
 langchain-pinecone==0.2.0
 langchain-text-splitters==0.3.2
 langcodes==3.5.0
