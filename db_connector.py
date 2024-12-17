@@ -1,11 +1,10 @@
 from pinecone import Pinecone, ServerlessSpec
-
+from langchain_openai import OpenAIEmbeddings
 from config import (
     PINECONE_API_KEY,
     PINECONE_INDEX,
     OPENAI_API_KEY
 )
-from langchain_community.embeddings import OpenAIEmbeddings
 from utils import log_error, log_info
 
 # Define the serverless spec for cloud and region
@@ -13,8 +12,8 @@ CLOUD = 'aws'
 REGION = 'us-east-1'
 SPEC = ServerlessSpec(cloud=CLOUD, region=REGION)
 
-# Initialize Pinecone client with the serverless spec
-pc = Pinecone(api_key=PINECONE_API_KEY, spec=SPEC)
+# Initialize Pinecone client instance
+pc = Pinecone(api_key=PINECONE_API_KEY)
 
 def initialize_pinecone():
     """
@@ -29,16 +28,13 @@ def initialize_pinecone():
         if PINECONE_INDEX not in existing_indexes:
             pc.create_index(
                 name=PINECONE_INDEX,
-                dimension=768,  # Ensure this matches your embedding dimensionality
-                metric='cosine', 
-                spec=SPEC,
-                  # Recommended for semantic similarity searches
-                # metadata_config={"indexed": ["text"]}
+                dimension=1536,  # Ensure this matches your embedding dimensionality
+                metric='cosine',
+                spec=SPEC
             )
             log_info(f"Created new Pinecone index: {PINECONE_INDEX}")
         
         # Initialize the index for further operations
-        # index = pc.index(PINECONE_INDEX)
         index = pc.Index(name=PINECONE_INDEX)
         log_info(f"Pinecone index '{PINECONE_INDEX}' initialized successfully.")
         return index
@@ -105,7 +101,7 @@ def retrieve_chunks(index, query, embeddings, top_k=5):
     try:
         query_vector = embeddings.embed_query(query)
         results = index.query(vector=query_vector, top_k=top_k, include_metadata=True)
-        retrieved_chunks = [match['metadata']['text'] for match in results['matches']]
+        retrieved_chunks = [match['metadata']['text'] for match in results.matches]
         log_info(f"Retrieved {len(retrieved_chunks)} chunks from Pinecone for the query.")
         return retrieved_chunks
     except Exception as e:

@@ -145,3 +145,6 @@ app.log
 .v
 .docs/
 docs/Acura_RSX_Shop_Manual.pdf
+.test/
+test/sample.txt
+docs/Zelda.pdf
